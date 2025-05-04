@@ -4,8 +4,9 @@ import { ExpoConfig, ConfigContext } from 'expo/config';
 export default ({ config }: ConfigContext): ExpoConfig => {
   return {
     ...config,
+    owner: "radioconexion",
     name: "Radio Conexion",
-    slug: "radioconexionapp",
+    slug: "radio-conexion",
     version: "1.0.0",
     orientation: "portrait",
     icon: "./assets/icon.png",
