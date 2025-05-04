@@ -1,45 +1,309 @@
-import React, { useEffect } from 'react';
-import { StyleSheet, Text, View, Alert } from 'react-native';
+import React, { useEffect, useState, useRef } from 'react';
+import {
+  View,
+  Text,
+  Image,
+  TouchableOpacity,
+  StyleSheet,
+  Animated,
+  ImageSourcePropType,
+} from 'react-native';
+import Slider from '@react-native-community/slider';
+import { Audio } from 'expo-av';
+import { Svg, Path } from 'react-native-svg';
 
-export default function App() {
+interface SongData {
+  songName: string;
+  artist: string;
+  albumCover: ImageSourcePropType;
+}
+
+const initialSetup = (): void => {
+  // Any setup code here
+};
+
+const RadioVivo: React.FC = () => {
+  const [isPlaying, setIsPlaying] = useState<boolean>(false);
+  const [volume, setVolume] = useState<number>(0.8);
+  const [songData, setSongData] = useState<SongData>({
+    songName: 'Radio Conexión',
+    artist: '102.9 FM',
+    albumCover: require('@/../assets/images/tab-logo.png'),
+  });
+  const [barHeights, setBarHeights] = useState<number[]>([]);
+  const soundRef = useRef<Audio.Sound | null>(null);
+  const animationRef = useRef<NodeJS.Timeout | null>(null);
+
+  // Animated values for equalizer bars
+  const animatedValues = useRef<Animated.Value[]>(
+    Array.from({ length: 15 }, () => new Animated.Value(10))
+  ).current;
+
+  // Generate random heights for equalizer bars, visual purposes only
+  const generateRandomHeights = (): void => {
+    const heights: number[] = Array.from({ length: 15 }, () => 
+      Math.floor(Math.random() * 70) + 10
+    );
+    setBarHeights(heights);
+  };
+
   useEffect(() => {
-    Alert.alert("hola");
+    // Initial setup
+    initialSetup();
+    generateRandomHeights();
+
+    // Setup audio
+    setupAudio();
+
+    return () => {
+      // Cleanup
+      if (soundRef.current) {
+        soundRef.current.unloadAsync();
+      }
+      stopEqualizerAnimation();
+    };
   }, []);
+
+  const setupAudio = async (): Promise<void> => {
+    try {
+      await Audio.setAudioModeAsync({
+        allowsRecordingIOS: false,
+        staysActiveInBackground: true,
+        playsInSilentModeIOS: true,
+        shouldDuckAndroid: true,
+        playThroughEarpieceAndroid: false,
+      });
+
+      const { sound } = await Audio.Sound.createAsync(
+        { uri: 'https://a9.asurahosting.com:8760/radio.mp3' },
+        { shouldPlay: false, volume: volume }
+      );
+      
+      soundRef.current = sound;
+    } catch (error) {
+      console.error('Error setting up audio:', error);
+    }
+  };
+
+  const togglePlayPause = async (): Promise<void> => {
+    if (!soundRef.current) return;
+    
+    try {
+      if (isPlaying) {
+        await soundRef.current.pauseAsync();
+        stopEqualizerAnimation();
+      } else {
+        await soundRef.current.playAsync();
+        animateEqualizer();
+      }
+      setIsPlaying(!isPlaying);
+    } catch (error) {
+      console.error('Error toggling playback:', error);
+    }
+  };
+  
+  const handleVolumeChange = async (newVolume: number): Promise<void> => {
+    setVolume(newVolume);
+    if (soundRef.current) {
+      try {
+        await soundRef.current.setVolumeAsync(newVolume);
+      } catch (error) {
+        console.error('Error setting volume:', error);
+      }
+    }
+  };
+  
+  const animateEqualizer = (): void => {
+    if (animationRef.current) {
+      clearInterval(animationRef.current);
+    }
+    
+    animationRef.current = setInterval(() => {
+      animatedValues.forEach(value => {
+        Animated.timing(value, {
+          toValue: Math.floor(Math.random() * 90) + 10,
+          duration: 100,
+          useNativeDriver: false
+        }).start();
+      });
+    }, 100);
+  };
+  
+  const stopEqualizerAnimation = (): void => {
+    if (animationRef.current) {
+      clearInterval(animationRef.current);
+      animationRef.current = null;
+    }
+  };
 
   return (
     <View style={styles.container}>
-      <Text style={styles.title}>Expo Firebase TypeScript App</Text>
-      
-      <View style={styles.card}>
-        <Text style={styles.subtitle}>Welcome</Text>
+      <View style={styles.radioCard}>
+        <Image 
+          source={songData.albumCover} 
+          style={styles.albumCover}
+          resizeMode="cover"
+        />
+        
+        <View style={styles.cardText}>
+          <Text style={styles.songTitle}>{songData.songName}</Text>
+          <Text style={styles.artistText}>{songData.artist}</Text>
+        </View>
+        
+        <View style={styles.equalizerContainer}>
+          {animatedValues.map((value, i) => (
+            <Animated.View 
+              key={i} 
+              style={[
+                styles.equalizerBar,
+                { 
+                  height: value.interpolate({
+                    inputRange: [0, 100],
+                    outputRange: ['0%', '100%']
+                  }),
+                  opacity: isPlaying ? 1 : 0.3
+                }
+              ]}
+            />
+          ))}
+        </View>
+      </View>
+
+      <View style={styles.playerControls}>
+        <TouchableOpacity 
+          style={[styles.playButton, isPlaying && styles.playingButton]} 
+          onPress={togglePlayPause}
+          activeOpacity={0.7}
+        >
+          {isPlaying ? (
+            <Svg width={24} height={24} viewBox="0 0 24 24">
+              <Path d="M6 19h4V5H6v14zm8-14v14h4V5h-4z" fill="#ffffff" />
+            </Svg>
+          ) : (
+            <Svg width={24} height={24} viewBox="0 0 24 24">
+              <Path d="M8 5v14l11-7z" fill="#ffffff" />
+            </Svg>
+          )}
+        </TouchableOpacity>
+        
+        <View style={styles.volumeControl}>
+          <Svg width={24} height={24} viewBox="0 0 24 24" style={styles.volumeIcon}>
+            <Path d="M3 9v6h4l5 5V4L7 9H3zm13.5 3c0-1.77-1.02-3.29-2.5-4.03v8.05c1.48-.73 2.5-2.25 2.5-4.02zM14 3.23v2.06c2.89.86 5 3.54 5 6.71s-2.11 5.85-5 6.71v2.06c4.01-.91 7-4.49 7-8.77s-2.99-7.86-7-8.77z" fill="#e2e2f5" />
+          </Svg>
+          
+          <Slider
+            style={styles.volumeSlider}
+            minimumValue={0}
+            maximumValue={1}
+            step={0.01}
+            value={volume}
+            onValueChange={handleVolumeChange}
+            minimumTrackTintColor="#C4BC74"
+            maximumTrackTintColor="rgba(255, 255, 255, 0.2)"
+            thumbTintColor="#C4BC74"
+          />
+        </View>
       </View>
     </View>
   );
-}
+};
 
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#fff',
+    backgroundColor: '#000',
     alignItems: 'center',
     justifyContent: 'center',
     padding: 20,
   },
-  title: {
-    fontSize: 24,
-    fontWeight: 'bold',
-    marginBottom: 20,
+  radioCard: {
+    width: '90%',
+    maxWidth: 350,
+    alignItems: 'center',
   },
-  subtitle: {
-    fontSize: 18,
-    fontWeight: 'bold',
-    marginBottom: 10,
-  },
-  card: {
+  albumCover: {
     width: '100%',
-    backgroundColor: '#f9f9f9',
-    borderRadius: 10,
-    padding: 15,
+    height: 350,
+    borderRadius: 25,
     marginBottom: 15,
+    shadowColor: 'rgba(196, 188, 116, 0.4)',
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.8,
+    shadowRadius: 15,
+    elevation: 8,
+  },
+  cardText: {
+    alignSelf: 'stretch',
+    marginTop: 15,
+  },
+  songTitle: {
+    fontSize: 30,
+    fontWeight: '700',
+    color: '#CCC8C0',
+    marginBottom: 5,
+  },
+  artistText: {
+    fontSize: 16,
+    fontWeight: '500',
+    color: '#808080',
+  },
+  equalizerContainer: {
+    flexDirection: 'row',
+    height: 80,
+    width: '100%',
+    alignItems: 'flex-end',
+    justifyContent: 'space-between',
+    marginTop: 40,
+    padding: 10,
+    backgroundColor: 'rgba(0, 0, 0, 0.2)',
+    borderRadius: 8,
+    overflow: 'hidden',
+  },
+  equalizerBar: {
+    flex: 1,
+    marginHorizontal: 1,
+    backgroundColor: '#C4BC74',
+    borderTopLeftRadius: 4,
+    borderTopRightRadius: 4,
+    minHeight: 3,
+  },
+  playerControls: {
+    width: '90%',
+    maxWidth: 350,
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    marginTop: 40,
+  },
+  playButton: {
+    width: 60,
+    height: 60,
+    borderRadius: 30,
+    backgroundColor: '#C4BC74',
+    alignItems: 'center',
+    justifyContent: 'center',
+    shadowColor: 'rgba(196, 188, 116, 0.4)',
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.8,
+    shadowRadius: 15,
+    elevation: 6,
+  },
+  playingButton: {
+    backgroundColor: '#CCC8C0',
+    shadowColor: 'rgba(56, 255, 216, 0.4)',
+  },
+  volumeControl: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    width: 150,
+  },
+  volumeIcon: {
+    marginRight: 10,
+  },
+  volumeSlider: {
+    flex: 1,
+    height: 40,
   },
 });
+
+export default RadioVivo;
