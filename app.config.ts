@@ -10,7 +10,7 @@ export default ({ config }: ConfigContext): ExpoConfig => {
     orientation: "portrait",
     icon: "./assets/icon.png",
     splash: {
-      image: "./assets/splash.png",
+      image: "./assets/splash-icon.png",
       resizeMode: "contain",
       backgroundColor: "#ffffff"
     },
@@ -40,11 +40,11 @@ export default ({ config }: ConfigContext): ExpoConfig => {
       firebaseMessagingSenderId: process.env.FIREBASE_MESSAGING_SENDER_ID,
       firebaseAppId: process.env.FIREBASE_APP_ID,
       eas: {
-        projectId: "4c0c924a-2921-4cce-8cfb-d46173e23f21"
+        projectId: "f6dac8eb-fd12-4d6c-a02b-0dea60be87ab"
       }
     },
     updates: {
-        url: "https://u.expo.dev/4c0c924a-2921-4cce-8cfb-d46173e23f21",
+        url: "https://u.expo.dev/f6dac8eb-fd12-4d6c-a02b-0dea60be87ab",
         fallbackToCacheTimeout: 0,
     },
     runtimeVersion: "1.0.0",

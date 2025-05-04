@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { StyleSheet, Text, View, Button } from 'react-native';
+import { StyleSheet, Text, View, TouchableOpacity } from 'react-native';
 import { auth, db } from '@/config/firebase';
 import { onAuthStateChanged, signInAnonymously } from 'firebase/auth';
 import { collection, getDocs } from 'firebase/firestore';
@@ -54,13 +54,18 @@ export default function App() {
       <View style={styles.card}>
         <Text style={styles.subtitle}>Auth Status:</Text>
         <Text>{user ? `Signed in as ${user.uid}` : 'Not signed in'}</Text>
-        {!user && <Button title="Sign in Anonymously" onPress={signInAnon} />}
+        {!user && 
+          <TouchableOpacity onPress={signInAnon} >
+            Sign in Anonymously
+          </TouchableOpacity>}
       </View>
       
       <View style={styles.card}>
         <Text style={styles.subtitle}>Firestore Data:</Text>
         <Text style={styles.data}>{data}</Text>
-        <Button title="Fetch Data" onPress={fetchData} />
+        <TouchableOpacity onPress={fetchData} >
+          Fetch Data
+        </TouchableOpacity>
       </View>
     </View>
   );
