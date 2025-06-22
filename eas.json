@@ -1,12 +1,14 @@
 {
     "cli": {
-      "version": ">= 3.13.3"
+      "version": ">= 3.13.3",
+      "appVersionSource": "remote"
     },
     "build": {
         "base": {
             "env": {
                 "GOOGLE_SERVICES_JSON": "@GOOGLE_SERVICES_JSON"
-            }
+            },
+            "channel": "base"
         },
         "development": {
             "extends": "base",

@@ -25,13 +25,20 @@ export default ({ config }: ConfigContext): ExpoConfig => {
     },
     android: {
       adaptiveIcon: {
-        foregroundImage: "./assets/adaptive-icon.png",
+        foregroundImage: "./assets/conexion-icon.png",
         backgroundColor: "#FFFFFF"
       },
-      package: "com.alejo742.radioconexion"
+      package: "com.alejo742.radioconexion",
+      permissions: [
+        "INTERNET",
+        "ACCESS_NETWORK_STATE",
+      ]
+    },
+    androidStatusBar: {
+      backgroundColor: "#000000",
     },
     web: {
-      favicon: "./assets/favicon.png"
+      favicon: "./assets/conexion-icon.png"
     },
     extra: {
       // Access environment variables that EAS injects during build
