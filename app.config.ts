@@ -5,7 +5,7 @@ export default ({ config }: ConfigContext): ExpoConfig => {
   return {
     ...config,
     owner: "radioconexion",
-    name: "Radio Conexion",
+    name: "Conexión",
     slug: "radio-conexion",
     version: "1.0.0",
     orientation: "portrait",
