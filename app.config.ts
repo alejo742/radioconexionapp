@@ -12,7 +12,7 @@ export default ({ config }: ConfigContext): ExpoConfig => {
     icon: "./assets/icon.png",
     newArchEnabled: true,
     splash: {
-      image: "./assets/splash-icon.png",
+      image: "./assets/conexion-icon.png",
       resizeMode: "contain",
       backgroundColor: "#ffffff"
     },
