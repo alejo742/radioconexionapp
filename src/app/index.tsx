@@ -7,10 +7,14 @@ import {
   StyleSheet,
   Animated,
   ImageSourcePropType,
+  Modal,
+  Pressable,
+  ScrollView,
 } from 'react-native';
 import Slider from '@react-native-community/slider';
 import { Audio } from 'expo-av';
 import { Svg, Path } from 'react-native-svg';
+import Privacidad from '../privacidad/Privacidad';
 
 interface SongData {
   songName: string;
@@ -25,6 +29,7 @@ const initialSetup = (): void => {
 const RadioVivo: React.FC = () => {
   const [isPlaying, setIsPlaying] = useState<boolean>(false);
   const [volume, setVolume] = useState<number>(0.8);
+  const [showPrivacidad, setShowPrivacidad] = useState<boolean>(false);
   const [songData, setSongData] = useState<SongData>({
     songName: 'Radio Conexión',
     artist: '102.9 FM',
@@ -41,7 +46,7 @@ const RadioVivo: React.FC = () => {
 
   // Generate random heights for equalizer bars, visual purposes only
   const generateRandomHeights = (): void => {
-    const heights: number[] = Array.from({ length: 15 }, () => 
+    const heights: number[] = Array.from({ length: 15 }, () =>
       Math.floor(Math.random() * 70) + 10
     );
     setBarHeights(heights);
@@ -78,7 +83,7 @@ const RadioVivo: React.FC = () => {
         { uri: 'https://a9.asurahosting.com:8760/radio.mp3' },
         { shouldPlay: false, volume: volume }
       );
-      
+
       soundRef.current = sound;
     } catch (error) {
       console.error('Error setting up audio:', error);
@@ -87,7 +92,7 @@ const RadioVivo: React.FC = () => {
 
   const togglePlayPause = async (): Promise<void> => {
     if (!soundRef.current) return;
-    
+
     try {
       if (isPlaying) {
         await soundRef.current.pauseAsync();
@@ -101,7 +106,7 @@ const RadioVivo: React.FC = () => {
       console.error('Error toggling playback:', error);
     }
   };
-  
+
   const handleVolumeChange = async (newVolume: number): Promise<void> => {
     setVolume(newVolume);
     if (soundRef.current) {
@@ -112,12 +117,12 @@ const RadioVivo: React.FC = () => {
       }
     }
   };
-  
+
   const animateEqualizer = (): void => {
     if (animationRef.current) {
       clearInterval(animationRef.current);
     }
-    
+
     animationRef.current = setInterval(() => {
       animatedValues.forEach(value => {
         Animated.timing(value, {
@@ -128,7 +133,7 @@ const RadioVivo: React.FC = () => {
       });
     }, 100);
   };
-  
+
   const stopEqualizerAnimation = (): void => {
     if (animationRef.current) {
       clearInterval(animationRef.current);
@@ -139,24 +144,24 @@ const RadioVivo: React.FC = () => {
   return (
     <View style={styles.container}>
       <View style={styles.radioCard}>
-        <Image 
-          source={songData.albumCover} 
+        <Image
+          source={songData.albumCover}
           style={styles.albumCover}
           resizeMode="cover"
         />
-        
+
         <View style={styles.cardText}>
           <Text style={styles.songTitle}>{songData.songName}</Text>
           <Text style={styles.artistText}>{songData.artist}</Text>
         </View>
-        
+
         <View style={styles.equalizerContainer}>
           {animatedValues.map((value, i) => (
-            <Animated.View 
-              key={i} 
+            <Animated.View
+              key={i}
               style={[
                 styles.equalizerBar,
-                { 
+                {
                   height: value.interpolate({
                     inputRange: [0, 100],
                     outputRange: ['0%', '100%']
@@ -170,8 +175,8 @@ const RadioVivo: React.FC = () => {
       </View>
 
       <View style={styles.playerControls}>
-        <TouchableOpacity 
-          style={[styles.playButton, isPlaying && styles.playingButton]} 
+        <TouchableOpacity
+          style={[styles.playButton, isPlaying && styles.playingButton]}
           onPress={togglePlayPause}
           activeOpacity={0.7}
         >
@@ -185,12 +190,12 @@ const RadioVivo: React.FC = () => {
             </Svg>
           )}
         </TouchableOpacity>
-        
+
         <View style={styles.volumeControl}>
           <Svg width={24} height={24} viewBox="0 0 24 24" style={styles.volumeIcon}>
             <Path d="M3 9v6h4l5 5V4L7 9H3zm13.5 3c0-1.77-1.02-3.29-2.5-4.03v8.05c1.48-.73 2.5-2.25 2.5-4.02zM14 3.23v2.06c2.89.86 5 3.54 5 6.71s-2.11 5.85-5 6.71v2.06c4.01-.91 7-4.49 7-8.77s-2.99-7.86-7-8.77z" fill="#e2e2f5" />
           </Svg>
-          
+
           <Slider
             style={styles.volumeSlider}
             minimumValue={0}
@@ -204,6 +209,32 @@ const RadioVivo: React.FC = () => {
           />
         </View>
       </View>
+
+      <TouchableOpacity
+        style={styles.privacidadButton}
+        onPress={() => setShowPrivacidad(true)}
+      >
+        <Text style={styles.privacidadButtonText}>Política de Privacidad</Text>
+      </TouchableOpacity>
+
+      <Modal
+        visible={showPrivacidad}
+        animationType="slide"
+        transparent={false}
+        onRequestClose={() => setShowPrivacidad(false)}
+      >
+        <View style={{ flex: 1, backgroundColor: '#000' }}>
+          <ScrollView contentContainerStyle={{ flexGrow: 1 }}>
+            <Privacidad />
+            <Pressable
+              style={styles.cerrarButton}
+              onPress={() => setShowPrivacidad(false)}
+            >
+              <Text style={styles.cerrarButtonText}>Cerrar</Text>
+            </Pressable>
+          </ScrollView>
+        </View>
+      </Modal>
     </View>
   );
 };
@@ -303,6 +334,32 @@ const styles = StyleSheet.create({
   volumeSlider: {
     flex: 1,
     height: 40,
+  },
+  privacidadButton: {
+    marginTop: 30,
+    paddingVertical: 10,
+    paddingHorizontal: 24,
+    backgroundColor: '#222',
+    borderRadius: 8,
+    alignItems: 'center',
+  },
+  privacidadButtonText: {
+    color: '#C4BC74',
+    fontSize: 16,
+    fontWeight: '600',
+  },
+  cerrarButton: {
+    marginTop: 30,
+    alignSelf: 'center',
+    backgroundColor: '#222',
+    paddingVertical: 10,
+    paddingHorizontal: 24,
+    borderRadius: 8,
+  },
+  cerrarButtonText: {
+    color: '#C4BC74',
+    fontSize: 16,
+    fontWeight: '600',
   },
 });
 

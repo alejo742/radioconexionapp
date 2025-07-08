@@ -1,20 +1,25 @@
 {
-  "extends": "expo/tsconfig.base",
   "compilerOptions": {
-    "strict": true,
-    "esModuleInterop": true,
-    "jsx": "react-native",
-    "target": "es2016",
-    "lib": ["dom", "es2016"],
+    "target": "es5",
+    "lib": [
+      "dom",
+      "dom.iterable",
+      "esnext"
+    ],
     "allowJs": true,
     "skipLibCheck": true,
+    "strict": true,
+    "forceConsistentCasingInFileNames": true,
     "noEmit": true,
-    "allowSyntheticDefaultImports": true,
-    "resolveJsonModule": true,
+    "esModuleInterop": true,
+    "module": "commonjs",
     "moduleResolution": "node",
-    "baseUrl": ".",
-    "paths": {
-      "@/*": ["src/*"]
-    }
-  }
+    "resolveJsonModule": true,
+    "isolatedModules": true,
+    "jsx": "react-native"
+  },
+  "exclude": [
+    "node_modules"
+  ],
+  "extends": "expo/tsconfig.base"
 }

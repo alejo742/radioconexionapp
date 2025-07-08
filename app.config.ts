@@ -14,7 +14,7 @@ export default ({ config }: ConfigContext): ExpoConfig => {
     splash: {
       image: "./assets/splash-icon.png",
       resizeMode: "contain",
-      backgroundColor: "#ffffff"
+      backgroundColor: "#000000"
     },
     assetBundlePatterns: [
       "**/*"
@@ -25,7 +25,7 @@ export default ({ config }: ConfigContext): ExpoConfig => {
     },
     android: {
       adaptiveIcon: {
-        foregroundImage: "./assets/conexion-icon.png",
+        foregroundImage: "./assets/icon.png",
         backgroundColor: "#FFFFFF"
       },
       package: "com.alejo742.radioconexion",
