@@ -5,14 +5,14 @@ export default ({ config }: ConfigContext): ExpoConfig => {
   return {
     ...config,
     owner: "radioconexion",
-    name: "Radio Conexion",
+    name: "Conexión",
     slug: "radio-conexion",
     version: "1.0.0",
     orientation: "portrait",
     icon: "./assets/icon.png",
     newArchEnabled: true,
     splash: {
-      image: "./assets/splash-icon.png",
+      image: "./assets/conexion-icon.png",
       resizeMode: "contain",
       backgroundColor: "#000000"
     },
