@@ -1,20 +1,39 @@
-import { initializeApp, getApps, getApp } from 'firebase/app';
-import { getFirestore } from 'firebase/firestore';
-import Constants from 'expo-constants';
+import React from 'react';
+import { View, Text, StyleSheet, Image } from 'react-native';
 
-// Your Firebase configuration from app.config.ts
-const firebaseConfig = {
-  apiKey: Constants.expoConfig?.extra?.firebaseApiKey || process.env.FIREBASE_API_KEY,
-  authDomain: Constants.expoConfig?.extra?.firebaseAuthDomain || process.env.FIREBASE_AUTH_DOMAIN,
-  projectId: Constants.expoConfig?.extra?.firebaseProjectId || process.env.FIREBASE_PROJECT_ID,
-  storageBucket: Constants.expoConfig?.extra?.firebaseStorageBucket || process.env.FIREBASE_STORAGE_BUCKET,
-  messagingSenderId: Constants.expoConfig?.extra?.firebaseMessagingSenderId || process.env.FIREBASE_MESSAGING_SENDER_ID,
-  appId: Constants.expoConfig?.extra?.firebaseAppId || process.env.FIREBASE_APP_ID,
+const Privacidad: React.FC = () => {
+  return (
+    <View style={styles.container}>
+      <Image 
+        source={require('@/../assets/images/tab-logo.png')} 
+        style={styles.logo} 
+        resizeMode="contain" 
+      />
+      <Text style={styles.policyText}>
+        Esta es nuestra política de privacidad. Aquí describimos cómo recopilamos, usamos y protegemos su información personal.
+        ...
+      </Text>
+    </View>
+  );
 };
 
-// Initialize Firebase
-const app = !getApps().length ? initializeApp(firebaseConfig) : getApp();
+const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+    backgroundColor: '#000',
+    alignItems: 'center',
+    justifyContent: 'center',
+    padding: 20,
+  },
+  logo: {
+    width: 200,
+    height: 200,
+    marginBottom: 20,
+  },
+  policyText: {
+    color: '#FFF',
+    textAlign: 'center',
+  },
+});
 
-export const db = getFirestore(app);
-
-export default { app, db };
+export default Privacidad;
