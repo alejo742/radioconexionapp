@@ -1,4 +1,4 @@
-package com.alejo742.radioconexion
+package com.conexion.app
 
 import android.app.Application
 import android.content.res.Configuration
