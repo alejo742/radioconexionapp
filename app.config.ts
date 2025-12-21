@@ -21,14 +21,15 @@ export default ({ config }: ConfigContext): ExpoConfig => {
     ],
     ios: {
       supportsTablet: true,
-      bundleIdentifier: "com.radioconexion.app"
+      bundleIdentifier: "com.conexion.app"
     },
     android: {
+      versionCode: 3,
       adaptiveIcon: {
         foregroundImage: "./assets/conexion-icon.png",
         backgroundColor: "#FFFFFF"
       },
-      package: "com.alejo742.radioconexion",
+      package: "com.conexion.app",
       permissions: [
         "INTERNET",
         "ACCESS_NETWORK_STATE",
@@ -56,6 +57,6 @@ export default ({ config }: ConfigContext): ExpoConfig => {
         url: "https://u.expo.dev/f6dac8eb-fd12-4d6c-a02b-0dea60be87ab",
         fallbackToCacheTimeout: 0,
     },
-    runtimeVersion: "1.0.0",
+    runtimeVersion: "1.0.2",
   };
 };
