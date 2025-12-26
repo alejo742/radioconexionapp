@@ -7,9 +7,9 @@ export default ({ config }: ConfigContext): ExpoConfig => {
     owner: "radioconexion",
     name: "Radio Conexion",
     slug: "radio-conexion",
-    version: "1.0.0",
+    version: "1.1.0",
     orientation: "portrait",
-    icon: "./assets/icon.png",
+    icon: "./assets/conexion-icon.png",
     newArchEnabled: true,
     splash: {
       image: "./assets/splash-icon.png",
@@ -20,6 +20,7 @@ export default ({ config }: ConfigContext): ExpoConfig => {
       "**/*"
     ],
     ios: {
+      icon: "./assets/conexion-icon.png",
       supportsTablet: true,
       bundleIdentifier: "com.conexion.app"
     },
@@ -57,6 +58,6 @@ export default ({ config }: ConfigContext): ExpoConfig => {
         url: "https://u.expo.dev/f6dac8eb-fd12-4d6c-a02b-0dea60be87ab",
         fallbackToCacheTimeout: 0,
     },
-    runtimeVersion: "1.0.2",
+    runtimeVersion: "1.0.1",
   };
 };
