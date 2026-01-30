@@ -12,9 +12,10 @@ import {
   ScrollView,
 } from 'react-native';
 import Slider from '@react-native-community/slider';
-import { Audio } from 'expo-av';
+import TrackPlayer, { State, usePlaybackState } from 'react-native-track-player';
 import { Svg, Path } from 'react-native-svg';
 import Privacidad from '../privacidad/Privacidad';
+import * as trackPlayerService from '../services/trackPlayerService';
 
 interface SongData {
   songName: string;
@@ -22,21 +23,15 @@ interface SongData {
   albumCover: ImageSourcePropType;
 }
 
-const initialSetup = (): void => {
-  // Any setup code here
-};
-
 const RadioVivo: React.FC = () => {
-  const [isPlaying, setIsPlaying] = useState<boolean>(false);
+  const playbackState = usePlaybackState();
   const [volume, setVolume] = useState<number>(0.8);
   const [showPrivacidad, setShowPrivacidad] = useState<boolean>(false);
-  const [songData, setSongData] = useState<SongData>({
+  const [songData] = useState<SongData>({
     songName: 'Radio Conexión',
     artist: '102.9 FM',
     albumCover: require('@/../assets/images/tab-logo.png'),
   });
-  const [barHeights, setBarHeights] = useState<number[]>([]);
-  const soundRef = useRef<Audio.Sound | null>(null);
   const animationRef = useRef<NodeJS.Timeout | null>(null);
 
   // Animated values for equalizer bars
@@ -44,64 +39,44 @@ const RadioVivo: React.FC = () => {
     Array.from({ length: 15 }, () => new Animated.Value(10))
   ).current;
 
-  // Generate random heights for equalizer bars, visual purposes only
-  const generateRandomHeights = (): void => {
-    const heights: number[] = Array.from({ length: 15 }, () =>
-      Math.floor(Math.random() * 70) + 10
-    );
-    setBarHeights(heights);
-  };
+  // Determine if player is playing based on state
+  const isPlaying = playbackState.state === State.Playing;
 
   useEffect(() => {
-    // Initial setup
-    initialSetup();
-    generateRandomHeights();
-
-    // Setup audio
-    setupAudio();
+    // Setup the player
+    setupTrackPlayer();
 
     return () => {
       // Cleanup
-      if (soundRef.current) {
-        soundRef.current.unloadAsync();
-      }
       stopEqualizerAnimation();
     };
   }, []);
 
-  const setupAudio = async (): Promise<void> => {
+  // Start/stop equalizer animation based on playback state
+  useEffect(() => {
+    if (isPlaying) {
+      animateEqualizer();
+    } else {
+      stopEqualizerAnimation();
+    }
+  }, [isPlaying]);
+
+  const setupTrackPlayer = async (): Promise<void> => {
     try {
-      await Audio.setAudioModeAsync({
-        allowsRecordingIOS: false,
-        staysActiveInBackground: true,
-        playsInSilentModeIOS: true,
-        shouldDuckAndroid: true,
-        playThroughEarpieceAndroid: false,
-      });
-
-      const { sound } = await Audio.Sound.createAsync(
-        { uri: 'https://a9.asurahosting.com:8760/radio.mp3' },
-        { shouldPlay: false, volume: volume }
-      );
-
-      soundRef.current = sound;
+      await trackPlayerService.setupPlayer();
+      await trackPlayerService.setVolume(volume);
     } catch (error) {
-      console.error('Error setting up audio:', error);
+      console.error('Error setting up track player:', error);
     }
   };
 
   const togglePlayPause = async (): Promise<void> => {
-    if (!soundRef.current) return;
-
     try {
       if (isPlaying) {
-        await soundRef.current.pauseAsync();
-        stopEqualizerAnimation();
+        await trackPlayerService.pause();
       } else {
-        await soundRef.current.playAsync();
-        animateEqualizer();
+        await trackPlayerService.play();
       }
-      setIsPlaying(!isPlaying);
     } catch (error) {
       console.error('Error toggling playback:', error);
     }
@@ -109,12 +84,10 @@ const RadioVivo: React.FC = () => {
 
   const handleVolumeChange = async (newVolume: number): Promise<void> => {
     setVolume(newVolume);
-    if (soundRef.current) {
-      try {
-        await soundRef.current.setVolumeAsync(newVolume);
-      } catch (error) {
-        console.error('Error setting volume:', error);
-      }
+    try {
+      await trackPlayerService.setVolume(newVolume);
+    } catch (error) {
+      console.error('Error setting volume:', error);
     }
   };
 
