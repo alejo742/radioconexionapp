@@ -22,10 +22,12 @@ export default ({ config }: ConfigContext): ExpoConfig => {
     ios: {
       icon: "./assets/conexion-icon.png",
       supportsTablet: true,
-      bundleIdentifier: "com.conexion.app"
+      bundleIdentifier: "com.conexion.app",
+      infoPlist: {
+        UIBackgroundModes: ["audio"],
+      }
     },
     android: {
-      versionCode: 3,
       adaptiveIcon: {
         foregroundImage: "./assets/conexion-icon.png",
         backgroundColor: "#FFFFFF"
@@ -34,6 +36,10 @@ export default ({ config }: ConfigContext): ExpoConfig => {
       permissions: [
         "INTERNET",
         "ACCESS_NETWORK_STATE",
+        "FOREGROUND_SERVICE",
+        "FOREGROUND_SERVICE_MEDIA_PLAYBACK",
+        "WAKE_LOCK",
+        "REQUEST_IGNORE_BATTERY_OPTIMIZATIONS",
       ]
     },
     androidStatusBar: {
