@@ -22,7 +22,7 @@ export default ({ config }: ConfigContext): ExpoConfig => {
     ios: {
       icon: "./assets/conexion-icon.png",
       supportsTablet: true,
-      bundleIdentifier: "com.conexion.app",
+      bundleIdentifier: "com.alejo742.radioconexion",
       infoPlist: {
         UIBackgroundModes: ["audio"],
       }
@@ -32,7 +32,7 @@ export default ({ config }: ConfigContext): ExpoConfig => {
         foregroundImage: "./assets/conexion-icon.png",
         backgroundColor: "#FFFFFF"
       },
-      package: "com.conexion.app",
+      package: "com.alejo742.radioconexion",
       permissions: [
         "INTERNET",
         "ACCESS_NETWORK_STATE",
