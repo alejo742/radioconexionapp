@@ -11,7 +11,6 @@ import {
   Pressable,
   ScrollView,
 } from 'react-native';
-import Slider from '@react-native-community/slider';
 import TrackPlayer, { State, usePlaybackState } from 'react-native-track-player';
 import { Svg, Path } from 'react-native-svg';
 import Privacidad from '../privacidad/Privacidad';
@@ -25,14 +24,13 @@ interface SongData {
 
 const RadioVivo: React.FC = () => {
   const playbackState = usePlaybackState();
-  const [volume, setVolume] = useState<number>(0.8);
   const [showPrivacidad, setShowPrivacidad] = useState<boolean>(false);
   const [songData] = useState<SongData>({
     songName: 'Radio Conexión',
     artist: '102.9 FM',
     albumCover: require('@/../assets/images/tab-logo.png'),
   });
-  const animationRef = useRef<NodeJS.Timeout | null>(null);
+  const animationRef = useRef<number | null>(null);
 
   // Animated values for equalizer bars
   const animatedValues = useRef<Animated.Value[]>(
@@ -64,7 +62,7 @@ const RadioVivo: React.FC = () => {
   const setupTrackPlayer = async (): Promise<void> => {
     try {
       await trackPlayerService.setupPlayer();
-      await trackPlayerService.setVolume(volume);
+      await trackPlayerService.setVolume(0.8);
     } catch (error) {
       console.error('Error setting up track player:', error);
     }
@@ -79,15 +77,6 @@ const RadioVivo: React.FC = () => {
       }
     } catch (error) {
       console.error('Error toggling playback:', error);
-    }
-  };
-
-  const handleVolumeChange = async (newVolume: number): Promise<void> => {
-    setVolume(newVolume);
-    try {
-      await trackPlayerService.setVolume(newVolume);
-    } catch (error) {
-      console.error('Error setting volume:', error);
     }
   };
 
@@ -163,24 +152,6 @@ const RadioVivo: React.FC = () => {
             </Svg>
           )}
         </TouchableOpacity>
-
-        <View style={styles.volumeControl}>
-          <Svg width={24} height={24} viewBox="0 0 24 24" style={styles.volumeIcon}>
-            <Path d="M3 9v6h4l5 5V4L7 9H3zm13.5 3c0-1.77-1.02-3.29-2.5-4.03v8.05c1.48-.73 2.5-2.25 2.5-4.02zM14 3.23v2.06c2.89.86 5 3.54 5 6.71s-2.11 5.85-5 6.71v2.06c4.01-.91 7-4.49 7-8.77s-2.99-7.86-7-8.77z" fill="#e2e2f5" />
-          </Svg>
-
-          <Slider
-            style={styles.volumeSlider}
-            minimumValue={0}
-            maximumValue={1}
-            step={0.01}
-            value={volume}
-            onValueChange={handleVolumeChange}
-            minimumTrackTintColor="#C4BC74"
-            maximumTrackTintColor="rgba(255, 255, 255, 0.2)"
-            thumbTintColor="#C4BC74"
-          />
-        </View>
       </View>
 
       <TouchableOpacity
@@ -274,15 +245,14 @@ const styles = StyleSheet.create({
   playerControls: {
     width: '90%',
     maxWidth: 350,
-    flexDirection: 'row',
     alignItems: 'center',
-    justifyContent: 'space-between',
+    justifyContent: 'center',
     marginTop: 40,
   },
   playButton: {
-    width: 60,
-    height: 60,
-    borderRadius: 30,
+    width: 80,
+    height: 80,
+    borderRadius: 40,
     backgroundColor: '#C4BC74',
     alignItems: 'center',
     justifyContent: 'center',
@@ -295,18 +265,6 @@ const styles = StyleSheet.create({
   playingButton: {
     backgroundColor: '#CCC8C0',
     shadowColor: 'rgba(56, 255, 216, 0.4)',
-  },
-  volumeControl: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    width: 150,
-  },
-  volumeIcon: {
-    marginRight: 10,
-  },
-  volumeSlider: {
-    flex: 1,
-    height: 40,
   },
   privacidadButton: {
     marginTop: 30,
